@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: TaskService
+  datasource:
+    url: jdbc:postgresql://localhost:5432/taskservice_db
+    username: admin
+    password: admin
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        ddl-auto: update
+
+server:
+  port: 8080
+
+springdoc:
+  packages-to-scan: ru.maksarts.taskservice.controllers
+  swagger-ui:
+    path: /taskservice-doc
+    tryItOutEnabled: true
+    operationsSorter: alpha
+    tagsSorter: alpha
+    filter: true
+  api-docs:
+    path: /taskservice-api-docs
+
+taskservice:
+  openapi:
+    dev-url: http://localhost:8080
