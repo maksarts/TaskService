@@ -1,40 +1,58 @@
 package ru.maksarts.taskservice.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Min;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
 
-import javax.persistence.Column;
-import javax.persistence.*;
+import jakarta.persistence.*;
+import java.util.Date;
 
+@Schema(description = "Задача в менеджере TaskService")
 @Entity
 @Table(name = "task")
 @Data
 public class Task {
+    @Schema(description = "ID задачи")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
+    @Schema(description = "Заголовок задачи")
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "description", nullable = false)
+    @Schema(description = "Описание задачи")
+    @Column(name = "description")
     private String description;
 
+    @Schema(description = "Приоритет задачи, чем выше значение - тем выше приориет")
     @Column(name = "priority", nullable = false)
+    @Min(0)
     private Integer priority;
 
+    @Schema(description = "Автор задачи")
     @ManyToOne
-    @JoinColumn(name = "author_id", referencedColumnName = "id", nullable = false)
-    private Employee author_id;
+    @JoinColumn(name = "author_email", referencedColumnName = "email", nullable = false, updatable = false)
+    private Employee author_email;
 
+    @Schema(description = "Исполнитель задачи")
     @ManyToOne
-    @JoinColumn(name = "executor_id", referencedColumnName = "id")
-    private Employee executor_id;
+    @JoinColumn(name = "executor_email", referencedColumnName = "email")
+    private Employee executor_email;
 
-    @Basic
+    @Schema(description = "Дата создания")
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_ts", nullable = false, updatable = false)
+    @CreationTimestamp
+    private Date created_ts;
+
+    @Basic(optional = false)
     @Column(name = "task_status", nullable = false)
     private Integer taskStatusValue;
 
+    @Schema(description = "Статус задачи")
     @Transient
     private TaskStatus taskStatus;
 

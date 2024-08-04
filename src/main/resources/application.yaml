@@ -10,12 +10,16 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         ddl-auto: update
+  security:
+    user:
+      name: admin
+      password: admin
 
 server:
   port: 8080
 
 springdoc:
-  packages-to-scan: ru.maksarts.taskservice.controllers
+  packages-to-scan: ru.maksarts.taskservice
   swagger-ui:
     path: /taskservice-doc
     tryItOutEnabled: true
@@ -23,7 +27,7 @@ springdoc:
     tagsSorter: alpha
     filter: true
   api-docs:
-    path: /taskservice-api-docs
+    path: /api-docs
 
 taskservice:
   openapi:

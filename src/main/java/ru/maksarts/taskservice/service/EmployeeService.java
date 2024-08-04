@@ -22,9 +22,8 @@ public class EmployeeService {
         return employeeRepository.findAll();
     }
 
-
-    public Employee getEmployeeById(@NonNull Long id) {
-        return employeeRepository.findById(id).orElse(null);
+    public Employee getEmployeeByEmail(@NonNull String email) {
+        return employeeRepository.findById(email).orElse(null);
     }
 
 
@@ -38,7 +37,7 @@ public class EmployeeService {
     }
 
 
-    public void deleteEmployee(@NonNull Long id) {
+    public void deleteEmployee(@NonNull String id) {
         employeeRepository.deleteById(id);
     }
 }

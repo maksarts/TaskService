@@ -1,18 +1,27 @@
 package ru.maksarts.taskservice.model;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "employee")
 @Data
 public class Employee {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
 
+    @Id
+    @NotNull
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
+
+    @NotNull
     @Column(name = "name", nullable = false, unique = true)
     private String name;
+
+    @NotNull
+    @Size(min = 8)
+    @Column(name = "password", nullable = false)
+    private String password;
 }

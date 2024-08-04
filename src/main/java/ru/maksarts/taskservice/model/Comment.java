@@ -2,7 +2,7 @@ package ru.maksarts.taskservice.model;
 
 import lombok.Data;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "comment")
@@ -14,8 +14,8 @@ public class Comment {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "author_id", referencedColumnName = "id", nullable = false)
-    private Employee author_id;
+    @JoinColumn(name = "author_email", referencedColumnName = "email", nullable = false)
+    private Employee author_email;
 
     @ManyToOne
     @JoinColumn(name = "task_id", referencedColumnName = "id", nullable = false)

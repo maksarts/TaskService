@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import ru.maksarts.taskservice.model.Employee;
 
 @Repository
-public interface EmployeeRepository extends JpaRepository<Employee, Long> {
+public interface EmployeeRepository extends JpaRepository<Employee, String> {
 }
