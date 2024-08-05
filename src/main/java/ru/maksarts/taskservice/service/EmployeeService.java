@@ -3,6 +3,7 @@ package ru.maksarts.taskservice.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 import ru.maksarts.taskservice.model.Employee;
 import ru.maksarts.taskservice.repository.EmployeeRepository;
 
@@ -23,7 +24,7 @@ public class EmployeeService {
     }
 
     public Employee getEmployeeByEmail(@NonNull String email) {
-        return employeeRepository.findById(email).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        return employeeRepository.findById(email).orElseThrow(() -> new NotFoundException("User not found"));
     }
 
 

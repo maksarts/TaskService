@@ -7,25 +7,23 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.ParameterExpression;
 import jakarta.persistence.criteria.Root;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import ru.maksarts.taskservice.model.Comment;
+import ru.maksarts.taskservice.model.Employee;
+import ru.maksarts.taskservice.model.Task;
 import ru.maksarts.taskservice.repository.CommentRepository;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class CommentService {
     private final CommentRepository commentRepository;
-
-    @PersistenceContext
-    private EntityManager entityManager;
-
-    @Autowired
-    public CommentService(CommentRepository repository){
-        this.commentRepository = repository;
-    }
+    private final EmployeeService employeeService;
+    private final TaskService taskService;
 
     public List<Comment> getAllComments() {
         return commentRepository.findAll();
@@ -35,19 +33,14 @@ public class CommentService {
         return commentRepository.findById(id).orElse(null);
     }
 
-    public List<Comment> getCommentByAuthor(@NonNull Long authorId) {
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Comment> criteriaQuery = criteriaBuilder.createQuery(Comment.class);
-        Root<Comment> root = criteriaQuery.from(Comment.class);
-        criteriaQuery.select(root);
+    public List<Comment> getCommentByAuthor(@NonNull String authorEmail) {
+        Employee employee = employeeService.getEmployeeByEmail(authorEmail);
+        return commentRepository.getCommentByAuthorEmail(employee);
+    }
 
-        ParameterExpression<Long> params = criteriaBuilder.parameter(Long.class);
-        criteriaQuery.where(criteriaBuilder.equal(root.get("author_id"), params));
-
-        TypedQuery<Comment> query = entityManager.createQuery(criteriaQuery);
-        query.setParameter(params, authorId);
-
-        return query.getResultList();
+    public List<Comment> getCommentByTaskId(@NonNull Long taskId) {
+       Task task = taskService.getTaskById(taskId);
+       return commentRepository.getCommentByTaskId(task);
     }
 
 

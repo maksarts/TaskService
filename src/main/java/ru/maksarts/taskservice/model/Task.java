@@ -35,12 +35,12 @@ public class Task {
     @Schema(description = "Автор задачи")
     @ManyToOne
     @JoinColumn(name = "author_email", referencedColumnName = "email", nullable = false, updatable = false)
-    private Employee author_email;
+    private Employee authorEmail;
 
     @Schema(description = "Исполнитель задачи")
     @ManyToOne
     @JoinColumn(name = "executor_email", referencedColumnName = "email")
-    private Employee executor_email;
+    private Employee executorEmail;
 
     @Schema(description = "Дата создания")
     @Temporal(TemporalType.TIMESTAMP)

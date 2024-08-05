@@ -15,11 +15,11 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "author_email", referencedColumnName = "email", nullable = false)
-    private Employee author_email;
+    private Employee authorEmail;
 
     @ManyToOne
     @JoinColumn(name = "task_id", referencedColumnName = "id", nullable = false)
-    private Task task_id;
+    private Task taskId;
 
     @Column(name = "content", nullable = false)
     private String content;

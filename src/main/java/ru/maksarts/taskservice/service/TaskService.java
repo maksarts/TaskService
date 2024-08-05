@@ -24,9 +24,6 @@ public class TaskService {
 
     private final EmployeeService employeeService;
 
-    @PersistenceContext
-    private EntityManager entityManager;
-
     @Autowired
     public TaskService(TaskRepository repository, EmployeeService employeeService){
         this.taskRepository = repository;
@@ -41,27 +38,14 @@ public class TaskService {
         return taskRepository.findById(id).orElse(null);
     }
 
-    public List<Task> getTaskByAuthor(@NonNull Long authorId){
-        return getTaskByEmployee(authorId, "author_id");
+    public List<Task> getTaskByAuthor(@NonNull String authorEmail){
+        Employee employee = employeeService.getEmployeeByEmail(authorEmail);
+        return taskRepository.getTaskByAuthorEmail(employee).stream().toList();
     }
 
-    public List<Task> getTaskByExecutor(@NonNull Long authorId){
-        return getTaskByEmployee(authorId, "executor_id");
-    }
-
-    private List<Task> getTaskByEmployee(@NonNull Long employeeId, @NonNull String field) {
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Task> criteriaQuery = criteriaBuilder.createQuery(Task.class);
-        Root<Task> root = criteriaQuery.from(Task.class);
-        criteriaQuery.select(root);
-
-        ParameterExpression<Long> params = criteriaBuilder.parameter(Long.class);
-        criteriaQuery.where(criteriaBuilder.equal(root.get(field), params));
-
-        TypedQuery<Task> query = entityManager.createQuery(criteriaQuery);
-        query.setParameter(params, employeeId);
-
-        return query.getResultList();
+    public List<Task> getTaskByExecutor(@NonNull String executorEmail){
+        Employee employee = employeeService.getEmployeeByEmail(executorEmail);
+        return taskRepository.getTaskByExecutorEmail(employee).stream().toList();
     }
 
 
@@ -81,9 +65,9 @@ public class TaskService {
             newTask.setPriority(0); // default priority
         }
 
-        newTask.setAuthor_email(emp);
+        newTask.setAuthorEmail(emp);
         if(taskDto.getExecutor_email() != null){
-            newTask.setExecutor_email(employeeService.getEmployeeByEmail(taskDto.getExecutor_email()));
+            newTask.setExecutorEmail(employeeService.getEmployeeByEmail(taskDto.getExecutor_email()));
         }
 
         newTask.setTaskStatus(TaskStatus.OPEN);
