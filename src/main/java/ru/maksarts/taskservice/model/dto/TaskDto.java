@@ -1,6 +1,7 @@
 package ru.maksarts.taskservice.model.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -19,10 +20,7 @@ public class TaskDto {
     @Min(0)
     private Integer priority;
 
-    @Schema(description = "Автор задачи")
-    @NotNull
-    private String author_email;
-
     @Schema(description = "Исполнитель задачи")
+    @Email
     private String executor_email;
 }

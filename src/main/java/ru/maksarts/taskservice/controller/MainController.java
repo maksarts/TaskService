@@ -1,5 +1,8 @@
 package ru.maksarts.taskservice.controller;
 
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import ru.maksarts.taskservice.model.Employee;
 import ru.maksarts.taskservice.model.dto.LoginRequest;
 import ru.maksarts.taskservice.model.dto.LoginResponse;
 import ru.maksarts.taskservice.model.dto.TaskDto;
@@ -17,6 +20,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.maksarts.taskservice.model.Task;
+import ru.maksarts.taskservice.service.TokenService;
 import ru.maksarts.taskservice.service.auth.AuthService;
 import ru.maksarts.taskservice.service.CommentService;
 import ru.maksarts.taskservice.service.TaskService;
@@ -24,46 +28,12 @@ import ru.maksarts.taskservice.service.TaskService;
 @Slf4j
 @RestController
 @RequestMapping("/taskservice/api/v1")
+@RequiredArgsConstructor
 @Tag(name = "TaskService", description = "Managing tasks service")
 public class MainController {
     private final TaskService taskService;
     private final CommentService commentService;
-    private AuthService authService;
-
-    @Autowired
-    public MainController(TaskService taskService,
-                          CommentService commentService,
-                          AuthService authService){
-        this.taskService = taskService;
-        this.commentService = commentService;
-        this.authService = authService;
-    }
-
-
-    @Operation(
-            summary = "Authorisation"
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = LoginResponse.class), mediaType = "application/json") }),
-            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = LoginResponse.class), mediaType = "application/json") })
-    })
-    @PostMapping(value = "/auth")
-    public ResponseEntity<LoginResponse> auth(@RequestBody LoginRequest loginRequest){
-        LoginResponse loginResponse = new LoginResponse();
-        try {
-            String token = authService.login(loginRequest);
-
-            loginResponse.setToken(token);
-            loginResponse.setEmail(loginRequest.getEmail());
-
-            return ResponseEntity.ok(loginResponse);
-
-        } catch (Exception ex){
-            log.error("Exception while authorisation: {}", ex.getMessage(), ex);
-            loginResponse.setErrMsg(ex.getMessage());
-            return ResponseEntity.internalServerError().body(loginResponse);
-        }
-    }
+    private final TokenService tokenService;
 
     @Operation(
             summary = "Get a task by Id",
@@ -92,15 +62,19 @@ public class MainController {
     @PostMapping(value = "/createTask",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> createTask(@RequestBody @Validated TaskDto taskDto, BindingResult bindingResult){
+    public ResponseEntity<Object> createTask(@RequestBody @Valid TaskDto taskDto,
+                                             @RequestHeader("Authorization") String authHeader,
+                                             BindingResult bindingResult){
         if (bindingResult.hasErrors()) {
             log.error(bindingResult.getAllErrors().toString());
             return ResponseEntity.badRequest()
                     .body(bindingResult.getAllErrors().toString()); // TODO нормальное тело ошибки
         }
 
-        Task task = taskService.createTask(taskDto);
+        Employee author = tokenService.getEmployeeByAuthHeader(authHeader); // get author of task by his JWT token
+        Task task = taskService.createTask(taskDto, author);
         if (task != null) {
+            log.info("Created task {} by user {}", task.getAuthor_email(), task.getTitle());
             return ResponseEntity.ok(task);
         } else {
             return ResponseEntity.internalServerError().build(); // TODO создать body и описание ошибки

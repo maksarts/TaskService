@@ -22,3 +22,17 @@ CREATE TABLE comment (
                          task_id INTEGER REFERENCES task(id),
                          content VARCHAR(1000)
 );
+
+CREATE TABLE refresh_token (
+                               id SERIAL PRIMARY KEY,
+                               employee_email VARCHAR(100) REFERENCES employee(email),
+                               token VARCHAR(500),
+                               expiry_date TIMESTAMP,
+                               revoked BOOLEAN
+);
+
+CREATE TABLE token (
+                       id SERIAL PRIMARY KEY,
+                       employee_email VARCHAR(100) REFERENCES employee(email),
+                       token VARCHAR(500)
+);

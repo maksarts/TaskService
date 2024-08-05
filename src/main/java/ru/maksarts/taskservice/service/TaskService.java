@@ -7,6 +7,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.ParameterExpression;
 import jakarta.persistence.criteria.Root;
+import ru.maksarts.taskservice.model.Employee;
 import ru.maksarts.taskservice.model.dto.TaskDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
@@ -65,10 +66,10 @@ public class TaskService {
 
 
     public Task createTask(@NonNull Task task) {
-        return taskRepository.save(task); //TODO проверить с tx и session и без
+        return taskRepository.save(task);
     }
 
-    public Task createTask(@NonNull TaskDto taskDto) {
+    public Task createTask(@NonNull TaskDto taskDto, @NonNull Employee emp) {
         Task newTask = new Task();
 
         newTask.setTitle(taskDto.getTitle());
@@ -80,7 +81,7 @@ public class TaskService {
             newTask.setPriority(0); // default priority
         }
 
-        newTask.setAuthor_email(employeeService.getEmployeeByEmail(taskDto.getAuthor_email())); //TODO должно быть заполнение из авторизованного пользователя
+        newTask.setAuthor_email(emp);
         if(taskDto.getExecutor_email() != null){
             newTask.setExecutor_email(employeeService.getEmployeeByEmail(taskDto.getExecutor_email()));
         }

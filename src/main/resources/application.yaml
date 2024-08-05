@@ -32,3 +32,10 @@ springdoc:
 taskservice:
   openapi:
     dev-url: http://localhost:8080
+  security:
+    jwt:
+      expiration: 3600000 #  1 h in ms
+      cookie-name: jwt-cookie
+      refresh-token:
+        expiration: 1296000000 # 15 days in ms
+        cookie-name: refresh-jwt-cookie

@@ -23,7 +23,7 @@ public class EmployeeService {
     }
 
     public Employee getEmployeeByEmail(@NonNull String email) {
-        return employeeRepository.findById(email).orElse(null);
+        return employeeRepository.findById(email).orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 
 

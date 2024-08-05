@@ -1,17 +1,16 @@
 package ru.maksarts.taskservice.model.dto;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class LoginRequest {
+public class RegisterRequest {
     @NotNull
-    @Email
     private String email;
+
+    @NotNull
+    private String name;
 
     @NotNull
     @Size(min = 8)

@@ -1,4 +1,4 @@
-package ru.maksarts.taskservice.service.auth;
+package ru.maksarts.taskservice.service.auth.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
@@ -32,5 +32,15 @@ public class EmployeeUserDetailsService implements UserDetailsService {
             .password(emp.getPassword())
             .roles(roles.toArray(new String[0]))
             .build();
+    }
+
+    public UserDetails createUserFromEmployee(Employee emp){
+        List<String> roles = new ArrayList<>();
+        roles.add("USER");
+        return User.builder()
+                .username(emp.getEmail())
+                .password(emp.getPassword())
+                .roles(roles.toArray(new String[0]))
+                .build();
     }
 }
