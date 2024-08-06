@@ -42,6 +42,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<LoginResponse> register(@Valid @RequestBody RegisterRequest request) {
         LoginResponse authenticationResponse = authService.register(request);
+        log.warn("User [{}] registered successfully", authenticationResponse.getEmail());
         ResponseCookie jwtCookie = jwtService.generateJwtCookie(authenticationResponse.getToken());
         ResponseCookie refreshTokenCookie = refreshTokenService.generateRefreshTokenCookie(authenticationResponse.getRefreshToken());
         return ResponseEntity.ok()
@@ -66,6 +67,7 @@ public class AuthController {
     )
     public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginRequest request) {
         LoginResponse authenticationResponse = authService.authenticate(request);
+        log.warn("User [{}] authorised successfully", authenticationResponse.getEmail());
         ResponseCookie jwtCookie = jwtService.generateJwtCookie(authenticationResponse.getToken());
         ResponseCookie refreshTokenCookie = refreshTokenService.generateRefreshTokenCookie(authenticationResponse.getRefreshToken());
         return ResponseEntity.ok()

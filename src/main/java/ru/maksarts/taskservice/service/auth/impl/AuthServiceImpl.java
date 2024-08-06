@@ -9,9 +9,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.maksarts.taskservice.model.Employee;
 import ru.maksarts.taskservice.model.RefreshToken;
+import ru.maksarts.taskservice.model.Token;
 import ru.maksarts.taskservice.model.dto.LoginRequest;
 import ru.maksarts.taskservice.model.dto.LoginResponse;
 import ru.maksarts.taskservice.model.dto.RegisterRequest;
+import ru.maksarts.taskservice.repository.TokenRepository;
 import ru.maksarts.taskservice.service.EmployeeService;
 import ru.maksarts.taskservice.service.auth.AuthService;
 import ru.maksarts.taskservice.service.auth.RefreshTokenService;
@@ -27,6 +29,7 @@ public class AuthServiceImpl implements AuthService {
     private final RefreshTokenService refreshTokenService;
     private final EmployeeService employeeService;
     private final PasswordEncoder passwordEncoder;
+    private final TokenRepository tokenRepository;
 
 
     @Override
@@ -39,6 +42,7 @@ public class AuthServiceImpl implements AuthService {
         emp = employeeService.createEmployee(emp);
         UserDetails user = employeeUserDetailsService.createUserFromEmployee(emp);
         String jwt = jwtService.generateToken(user);
+        saveToken(emp, jwt);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(emp.getEmail());
 
 //        var roles = user.getRole().getAuthorities()
@@ -54,7 +58,6 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
 
-    //TODO хранить в бд токены
     @Override
     public LoginResponse authenticate(LoginRequest request) {
         authenticationManager.authenticate(
@@ -67,6 +70,7 @@ public class AuthServiceImpl implements AuthService {
 //                .map(SimpleGrantedAuthority::getAuthority)
 //                .toList();
         String jwt = jwtService.generateToken(user);
+        saveToken(emp, jwt);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(emp.getEmail());
         return LoginResponse.builder()
                 .token(jwt)
@@ -74,5 +78,13 @@ public class AuthServiceImpl implements AuthService {
                 .refreshToken(refreshToken.getToken())
                 .tokenType("BEARER")
                 .build();
+    }
+
+    // save token to DB to be able to identify employee by his token
+    private void saveToken(Employee emp, String token){
+        Token tokenEntity = tokenRepository.findByEmployee(emp).orElse(new Token());
+        tokenEntity.setEmployee(emp);
+        tokenEntity.setToken(token);
+        tokenRepository.save(tokenEntity);
     }
 }

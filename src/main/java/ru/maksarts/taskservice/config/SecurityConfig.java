@@ -60,12 +60,12 @@ public class SecurityConfig {
                 .exceptionHandling(
                         exception -> exception.authenticationEntryPoint(unauthorizedEntryPoint)
                 )
-                .authorizeHttpRequests((authorize) -> {
-                    authorize.requestMatchers(SWAGGER_WHITELIST).permitAll();
-                    authorize.requestMatchers("/taskservice/api/v1/auth/**").permitAll();
-                    authorize.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
-                    authorize.anyRequest().authenticated();
-                })
+                .authorizeHttpRequests(authorize -> authorize
+                    .requestMatchers(SWAGGER_WHITELIST).permitAll()
+                    .requestMatchers("/taskservice/api/v1/auth/**").permitAll()
+                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                    .anyRequest().authenticated()
+                )
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
@@ -73,6 +73,7 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {

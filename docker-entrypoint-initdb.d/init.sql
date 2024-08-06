@@ -7,7 +7,7 @@ CREATE TABLE employee (
 
 CREATE TABLE task (
                       id SERIAL PRIMARY KEY,
-                      title VARCHAR(500),
+                      title VARCHAR(500) UNIQUE,
                       description VARCHAR(1000),
                       priority INTEGER,
                       author_email VARCHAR(100) REFERENCES employee(email),

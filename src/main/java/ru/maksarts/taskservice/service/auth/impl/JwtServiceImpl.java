@@ -6,6 +6,7 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,10 +28,9 @@ import java.util.function.Function;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtServiceImpl implements JwtService {
 
-    private final EmployeeService employeeService;
-    private final TokenRepository tokenRepository;
 
     @Value("${taskservice.security.jwt.expiration}")
     private long jwtExpirationDate;
@@ -110,13 +110,6 @@ public class JwtServiceImpl implements JwtService {
                         .setExpiration(new Date(System.currentTimeMillis() + expiration))
                         .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                         .compact();
-
-        // save token to DB to be able to identify employee by his token
-        Employee emp = employeeService.getEmployeeByEmail(userDetails.getUsername());
-        Token tokenEntity = tokenRepository.findByEmployee(emp).orElse(new Token());
-        tokenEntity.setEmployee(emp);
-        tokenEntity.setToken(token);
-        tokenRepository.save(tokenEntity);
 
         return token;
     }

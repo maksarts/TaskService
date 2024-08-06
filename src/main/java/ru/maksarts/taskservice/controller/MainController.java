@@ -2,8 +2,15 @@ package ru.maksarts.taskservice.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.postgresql.util.PSQLException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.validation.BindException;
+import org.springframework.web.bind.ServletRequestBindingException;
 import org.webjars.NotFoundException;
+import ru.maksarts.taskservice.exception.ClientSideErrorException;
 import ru.maksarts.taskservice.model.Employee;
+import ru.maksarts.taskservice.model.dto.BasicResponse;
 import ru.maksarts.taskservice.model.dto.LoginRequest;
 import ru.maksarts.taskservice.model.dto.LoginResponse;
 import ru.maksarts.taskservice.model.dto.TaskDto;
@@ -98,23 +105,20 @@ public class MainController {
     @PostMapping(value = "/createTask",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> createTask(@RequestBody @Valid TaskDto taskDto,
-                                             @RequestHeader("Authorization") String authHeader,
-                                             BindingResult bindingResult){
-        if (bindingResult.hasErrors()) {
-            log.error(bindingResult.getAllErrors().toString());
-            return ResponseEntity.badRequest()
-                    .body(bindingResult.getAllErrors().toString()); // TODO нормальное тело ошибки
-        }
+    public ResponseEntity<BasicResponse> createTask(@Valid @RequestBody TaskDto taskDto,
+                                                    @RequestHeader("Authorization") String authHeader) {
 
         Employee author = tokenService.getEmployeeByAuthHeader(authHeader); // get author of task by his JWT token
         Task task = taskService.createTask(taskDto, author);
         if (task != null) {
             log.info("Created task {} by user {}", task.getTitle(), task.getAuthorEmail().getEmail());
-            return ResponseEntity.ok(task);
+            return ResponseEntity.ok(
+                        BasicResponse.builder().content(task).build()
+                    );
+
         } else {
-            log.error("Cannot create new task: author={}, task={}", author.getEmail(), taskDto.getTitle());
-            return ResponseEntity.internalServerError().build(); // TODO создать body и описание ошибки
+            log.error("Cannot create new task: task=null, author={}, task={}", author.getEmail(), taskDto.getTitle());
+            return ResponseEntity.internalServerError().build();
         }
     }
 

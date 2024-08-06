@@ -1,5 +1,6 @@
 package ru.maksarts.taskservice.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import lombok.Data;
@@ -20,7 +21,7 @@ public class Task {
     private Long id;
 
     @Schema(description = "Заголовок задачи")
-    @Column(name = "title", nullable = false)
+    @Column(name = "title", nullable = false, unique = true)
     private String title;
 
     @Schema(description = "Описание задачи")
@@ -48,9 +49,10 @@ public class Task {
     @CreationTimestamp
     private Date created_ts;
 
+    @JsonIgnore
     @Basic(optional = false)
     @Column(name = "task_status", nullable = false)
-    private Integer taskStatusValue;
+    private Integer taskStatusValue; // needed to correct representating ENUM values in DB
 
     @Schema(description = "Статус задачи")
     @Transient

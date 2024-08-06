@@ -3,14 +3,14 @@ package ru.maksarts.taskservice.model.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
 @Schema(description = "Структура запроса на добавление новой задачи в TaskService")
 public class TaskDto {
     @Schema(description = "Заголовок задачи")
-    @NotNull
+    @NotBlank(message = "Title is mandatory")
     private String title;
 
     @Schema(description = "Описание задачи")

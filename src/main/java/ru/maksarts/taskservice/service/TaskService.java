@@ -7,6 +7,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.ParameterExpression;
 import jakarta.persistence.criteria.Root;
+import ru.maksarts.taskservice.exception.ClientSideErrorException;
 import ru.maksarts.taskservice.model.Employee;
 import ru.maksarts.taskservice.model.dto.TaskDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,9 @@ public class TaskService {
 
 
     public Task createTask(@NonNull Task task) {
+        if(taskRepository.existsByTitle(task.getTitle())){
+            throw new ClientSideErrorException(String.format("Task with title %s alredy exists", task.getTitle()));
+        }
         return taskRepository.save(task);
     }
 

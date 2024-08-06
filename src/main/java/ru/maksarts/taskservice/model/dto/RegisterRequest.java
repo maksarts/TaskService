@@ -1,18 +1,19 @@
 package ru.maksarts.taskservice.model.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
 public class RegisterRequest {
-    @NotNull
+    @NotBlank(message = "Email is mandatory")
     private String email;
 
-    @NotNull
+    @NotBlank(message = "Name is mandatory")
     private String name;
 
-    @NotNull
+    @NotBlank(message = "Password is mandatory")
     @Size(min = 8)
     private String password;
 }
