@@ -11,9 +11,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 import ru.maksarts.taskservice.model.Comment;
 import ru.maksarts.taskservice.model.Employee;
 import ru.maksarts.taskservice.model.Task;
+import ru.maksarts.taskservice.model.dto.CommentDto;
 import ru.maksarts.taskservice.repository.CommentRepository;
 
 import java.util.List;
@@ -30,7 +32,7 @@ public class CommentService {
     }
 
     public Comment getCommentById(@NonNull Long id) {
-        return commentRepository.findById(id).orElse(null);
+        return commentRepository.findById(id).orElseThrow(() -> new NotFoundException("Comment not found"));
     }
 
     public List<Comment> getCommentByAuthor(@NonNull String authorEmail) {
@@ -44,7 +46,13 @@ public class CommentService {
     }
 
 
-    public Comment createComment(@NonNull Comment comment) {
+    public Comment createComment(@NonNull CommentDto commentDto, @NonNull Employee author) {
+        Task task = taskService.getTaskById(commentDto.getTaskId());
+        Comment comment = Comment.builder()
+                .authorEmail(author)
+                .taskId(task)
+                .content(commentDto.getContent())
+                .build();
         return commentRepository.save(comment);
     }
 

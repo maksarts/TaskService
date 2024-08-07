@@ -9,6 +9,7 @@ import jakarta.persistence.criteria.ParameterExpression;
 import jakarta.persistence.criteria.Root;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.transaction.annotation.Transactional;
+import org.webjars.NotFoundException;
 import ru.maksarts.taskservice.exception.ClientSideErrorException;
 import ru.maksarts.taskservice.model.Employee;
 import ru.maksarts.taskservice.model.dto.EditTaskDto;
@@ -39,7 +40,7 @@ public class TaskService {
     }
 
     public Task getTaskById(@NonNull Long id) {
-        return taskRepository.findById(id).orElse(null);
+        return taskRepository.findById(id).orElseThrow(() -> new NotFoundException("Task not found"));
     }
 
     public List<Task> getTaskByAuthor(@NonNull String authorEmail){

@@ -9,6 +9,7 @@ import org.springframework.validation.BindException;
 import org.springframework.web.bind.ServletRequestBindingException;
 import org.webjars.NotFoundException;
 import ru.maksarts.taskservice.exception.ClientSideErrorException;
+import ru.maksarts.taskservice.model.Comment;
 import ru.maksarts.taskservice.model.Employee;
 import ru.maksarts.taskservice.model.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -76,19 +77,11 @@ public class MainController {
     })
     @GetMapping(value = "/getTaskByAuthor")
     public ResponseEntity<List<Task>> getTaskByAuthor(@RequestParam(name = "email") String email){
-        try {
-            List<Task> task = taskService.getTaskByAuthor(email);
-            if (task != null && !task.isEmpty()) {
-                return ResponseEntity.ok(task);
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (NotFoundException notFound){
-            log.warn("NotFoundException while getting tasks by email: {}", notFound.getMessage());
+        List<Task> task = taskService.getTaskByAuthor(email);
+        if (task != null && !task.isEmpty()) {
+            return ResponseEntity.ok(task);
+        } else {
             return ResponseEntity.notFound().build();
-        } catch (Exception ex){
-            log.error("Exception while getting tasks by email: {}", ex.getMessage(), ex);
-            return ResponseEntity.internalServerError().build();
         }
     }
 
@@ -109,19 +102,11 @@ public class MainController {
     })
     @GetMapping(value = "/getTaskByExecutor")
     public ResponseEntity<List<Task>> getTaskByExecutor(@RequestParam(name = "email") String email){
-        try {
-            List<Task> task = taskService.getTaskByExecutor(email);
-            if (task != null && !task.isEmpty()) {
-                return ResponseEntity.ok(task);
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (NotFoundException notFound){
-            log.warn("NotFoundException while getting tasks by email: {}", notFound.getMessage());
+        List<Task> task = taskService.getTaskByExecutor(email);
+        if (task != null && !task.isEmpty()) {
+            return ResponseEntity.ok(task);
+        } else {
             return ResponseEntity.notFound().build();
-        } catch (Exception ex){
-            log.error("Exception while getting tasks by email: {}", ex.getMessage(), ex);
-            return ResponseEntity.internalServerError().build();
         }
     }
 
@@ -176,10 +161,6 @@ public class MainController {
                                                     @RequestHeader("Authorization") String authHeader){
         Employee author = tokenService.getEmployeeByAuthHeader(authHeader); // get author of request by his JWT token
         Task taskToEdit = taskService.getTaskById(editTaskDto.getId());
-        if(taskToEdit == null){
-            log.info("Task with id={} not found", editTaskDto.getId());
-            return ResponseEntity.notFound().build();
-        }
         if(taskToEdit.getAuthorEmail().getEmail().equals(author.getEmail())){
             taskToEdit = taskService.updateTask(taskToEdit, editTaskDto);
             return ResponseEntity.ok(taskToEdit);
@@ -215,10 +196,6 @@ public class MainController {
                                               @RequestHeader("Authorization") String authHeader){
         Employee author = tokenService.getEmployeeByAuthHeader(authHeader); // get author of request by his JWT token
         Task taskToEdit = taskService.getTaskById(id);
-        if(taskToEdit == null){
-            log.info("Task with id={} not found", id);
-            return ResponseEntity.notFound().build();
-        }
         if(taskToEdit.getAuthorEmail().getEmail().equals(author.getEmail()) ||
                 taskToEdit.getExecutorEmail() != null && taskToEdit.getExecutorEmail().getEmail().equals(author.getEmail())){
 
@@ -256,10 +233,6 @@ public class MainController {
                            @RequestHeader("Authorization") String authHeader){
         Employee author = tokenService.getEmployeeByAuthHeader(authHeader); // get author of request by his JWT token
         Task taskToDelete = taskService.getTaskById(id);
-        if(taskToDelete == null){
-            log.info("Task with id={} not found", id);
-            return ResponseEntity.notFound().build();
-        }
         if(taskToDelete.getAuthorEmail().getEmail().equals(author.getEmail())){
             taskService.deleteTask(id);
             return ResponseEntity.ok(
@@ -270,6 +243,121 @@ public class MainController {
                     BasicResponse.builder()
                             .errMsg("Access denied")
                             .errDesc("You can delete only your tasks")
+                            .build(),
+                    HttpStatus.FORBIDDEN);
+        }
+
+    }
+
+
+
+
+
+
+    @Operation(
+            summary = "Create new comment",
+            description = "Creates new comment under specified task by authorised author"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Task.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }),
+            @ApiResponse(responseCode = "401", content = { @Content(schema = @Schema()) })
+    })
+    @PostMapping(value = "/createComment",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> createComment(@Valid @RequestBody CommentDto commentDto,
+                                            @RequestHeader("Authorization") String authHeader) {
+
+        Employee author = tokenService.getEmployeeByAuthHeader(authHeader); // get author of task by his JWT token
+        Comment comment = commentService.createComment(commentDto, author);
+        if (comment != null) {
+            log.info("Created comment: id={} by user={}, task={}", comment.getId(), comment.getAuthorEmail().getEmail(), comment.getTaskId());
+            return ResponseEntity.ok(comment);
+
+        } else {
+            log.error("Cannot create commen by user={}, task={}", author.getEmail(), commentDto.getTaskId());
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+
+
+
+    @Operation(
+            summary = "Get comments of author",
+            description = "Returns all comments by specified author"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = List.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }),
+            @ApiResponse(responseCode = "401", content = { @Content(schema = @Schema()) })
+    })
+    @GetMapping(value = "/getCommentsByAuthor")
+    public ResponseEntity<List<Comment>> getCommentsByAuthor(@RequestParam(name = "email") String email){
+        List<Comment> comments = commentService.getCommentByAuthor(email);
+        if (comments != null && !comments.isEmpty()) {
+            return ResponseEntity.ok(comments);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
+
+
+
+    @Operation(
+            summary = "Get comments by task ID",
+            description = "Returns all comments under specified taskId"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = List.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }),
+            @ApiResponse(responseCode = "401", content = { @Content(schema = @Schema()) })
+    })
+    @GetMapping(value = "/getCommentsByTask")
+    public ResponseEntity<List<Comment>> getCommentsByTask(@RequestParam(name = "taskId") Long taskId){
+        List<Comment> comments = commentService.getCommentByTaskId(taskId);
+        if (comments != null && !comments.isEmpty()) {
+            return ResponseEntity.ok(comments);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
+
+
+    @Operation(
+            summary = "Delete comment",
+            description = "Deletes comment in TaskService by specified id"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema()) }),
+            @ApiResponse(responseCode = "403", content = { @Content(schema = @Schema(implementation = BasicResponse.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }),
+            @ApiResponse(responseCode = "401", content = { @Content(schema = @Schema()) })
+    })
+    @DeleteMapping(value = "/deleteComment")
+    public ResponseEntity<BasicResponse> deleteComment(@RequestParam(name = "id") Long id,
+                                                    @RequestHeader("Authorization") String authHeader){
+        Employee author = tokenService.getEmployeeByAuthHeader(authHeader); // get author of request by his JWT token
+        Comment commentToDelete = commentService.getCommentById(id);
+        if(commentToDelete.getAuthorEmail().getEmail().equals(author.getEmail())){
+            commentService.deleteComment(id);
+            return ResponseEntity.ok(
+                    BasicResponse.builder().content(String.format("Comment with id=%s was deleted", id)).build()
+            );
+        } else {
+            return new ResponseEntity<>(
+                    BasicResponse.builder()
+                            .errMsg("Access denied")
+                            .errDesc("You can delete only your comments")
                             .build(),
                     HttpStatus.FORBIDDEN);
         }
