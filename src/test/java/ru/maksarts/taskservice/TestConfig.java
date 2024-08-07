@@ -6,15 +6,18 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.lang.NonNull;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.webjars.NotFoundException;
 import ru.maksarts.taskservice.model.Employee;
 import ru.maksarts.taskservice.service.EmployeeService;
 
 @TestConfiguration
+@ActiveProfiles("test")
 public class TestConfig {
     private final PasswordEncoder encoder = new BCryptPasswordEncoder();
 
-    @Bean
+    @Bean("fakeEmployeeService")
+    @Primary
     public EmployeeService employeeService(){
         return new EmployeeService(null){
             @Override

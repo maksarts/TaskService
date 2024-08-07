@@ -7,8 +7,11 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.ParameterExpression;
 import jakarta.persistence.criteria.Root;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.transaction.annotation.Transactional;
 import ru.maksarts.taskservice.exception.ClientSideErrorException;
 import ru.maksarts.taskservice.model.Employee;
+import ru.maksarts.taskservice.model.dto.EditTaskDto;
 import ru.maksarts.taskservice.model.dto.TaskDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
@@ -57,6 +60,8 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
+    @Transactional
+    @Modifying
     public Task createTask(@NonNull TaskDto taskDto, @NonNull Employee emp) {
         Task newTask = new Task();
 
@@ -70,8 +75,8 @@ public class TaskService {
         }
 
         newTask.setAuthorEmail(emp);
-        if(taskDto.getExecutor_email() != null){
-            newTask.setExecutorEmail(employeeService.getEmployeeByEmail(taskDto.getExecutor_email()));
+        if(taskDto.getExecutorEmail() != null){
+            newTask.setExecutorEmail(employeeService.getEmployeeByEmail(taskDto.getExecutorEmail()));
         }
 
         newTask.setTaskStatus(TaskStatus.OPEN);
@@ -79,11 +84,44 @@ public class TaskService {
         return createTask(newTask);
     }
 
-    public Task updateTask(@NonNull Task task) {
-        return taskRepository.save(task);
+
+    public Task updateTaskStatus(@NonNull Task taskToEdit, @NonNull String status){
+        taskToEdit.setTaskStatusValue(null); // need to make JPA call @PreUpdate methods
+        return updateTask(taskToEdit,
+                EditTaskDto.builder()
+                        .id(taskToEdit.getId())
+                        .taskStatus(status)
+                        .build());
     }
 
 
+    @Transactional
+    @Modifying
+    public Task updateTask(@NonNull Task taskToEdit, @NonNull EditTaskDto editTaskDto) {
+        if(editTaskDto.getDescription() != null) taskToEdit.setDescription(editTaskDto.getDescription());
+        if(editTaskDto.getPriority() != null) taskToEdit.setPriority(editTaskDto.getPriority());
+        if(editTaskDto.getTitle() != null && !editTaskDto.getTitle().isBlank()) taskToEdit.setTitle(editTaskDto.getTitle());
+        if(editTaskDto.getExecutorEmail() != null){
+            if(!editTaskDto.getExecutorEmail().isBlank()) {
+                Employee executor = employeeService.getEmployeeByEmail(editTaskDto.getExecutorEmail());
+                if (executor == null) {
+                    throw new ClientSideErrorException(String.format("User [%s] not found", editTaskDto.getExecutorEmail()));
+                }
+                taskToEdit.setExecutorEmail(executor);
+            } else {
+                taskToEdit.setExecutorEmail(null);
+            }
+        }
+        if(editTaskDto.getTaskStatus() != null && !editTaskDto.getTaskStatus().isBlank()){
+            taskToEdit.setTaskStatusValue(null); // need to make JPA call @PreUpdate methods
+            TaskStatus taskStatus = TaskStatus.of(editTaskDto.getTaskStatus());
+            taskToEdit.setTaskStatus(taskStatus);
+        }
+        return taskRepository.save(taskToEdit);
+    }
+
+    @Transactional
+    @Modifying
     public void deleteTask(@NonNull Long id) {
         taskRepository.deleteById(id);
     }

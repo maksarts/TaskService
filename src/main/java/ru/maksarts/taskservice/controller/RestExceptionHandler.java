@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import org.webjars.NotFoundException;
 import ru.maksarts.taskservice.exception.ClientSideErrorException;
 import ru.maksarts.taskservice.model.dto.BasicResponse;
 
@@ -30,7 +31,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler({ClientSideErrorException.class})
-    protected ResponseEntity<Object> handleClientSideErrorException(ClientSideErrorException ex, WebRequest request) {
+    protected ResponseEntity<Object> handleClientSideErrorException(ClientSideErrorException ex) {
         return new ResponseEntity<>(
                 BasicResponse.builder().errMsg(ex.getLocalizedMessage()).build(),
                 HttpStatus.CONFLICT);
@@ -46,14 +47,24 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({PropertyValueException.class})
-    protected ResponseEntity<Object> handleInvalidArgument(PropertyValueException ex) {
+    @ExceptionHandler({PropertyValueException.class, IllegalArgumentException.class})
+    protected ResponseEntity<Object> handleInvalidArgument(Exception ex) {
         return new ResponseEntity<>(
                 BasicResponse.builder()
                         .errMsg("Invalid request")
-                        .errDesc(ex.getLocalizedMessage())
+                        .errDesc(ex.getMessage())
                         .build(),
                 HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({NotFoundException.class})
+    protected ResponseEntity<Object> handleNotFound(NotFoundException ex) {
+        return new ResponseEntity<>(
+                BasicResponse.builder()
+                        .errMsg("Not found")
+                        .errDesc(ex.getMessage())
+                        .build(),
+                HttpStatus.NOT_FOUND);
     }
 
 }

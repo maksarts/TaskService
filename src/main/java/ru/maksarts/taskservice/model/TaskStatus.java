@@ -19,6 +19,13 @@ public enum TaskStatus {
         return Stream.of(TaskStatus.values())
                 .filter(s -> s.getStatus() == status)
                 .findFirst()
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(() -> new IllegalArgumentException(String.format("Invalid taskStatusValue: %s", status)));
+    }
+
+    public static TaskStatus of(String status) {
+        return Stream.of(TaskStatus.values())
+                .filter(s -> s.name().equalsIgnoreCase(status))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(String.format("Invalid status: %s", status)));
     }
 }

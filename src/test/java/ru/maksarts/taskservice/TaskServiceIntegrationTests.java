@@ -5,16 +5,20 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.*;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.MultiValueMap;
 import ru.maksarts.taskservice.model.Task;
+import ru.maksarts.taskservice.service.EmployeeService;
 import ru.maksarts.taskservice.service.auth.JwtService;
 
 import java.util.ArrayList;
@@ -26,6 +30,7 @@ import static org.junit.Assert.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
                 properties = "spring.main.allow-bean-definition-overriding=true")
 @Slf4j
+@ActiveProfiles("test")
 @Import(TestConfig.class)
 public class TaskServiceIntegrationTests {
     @Autowired

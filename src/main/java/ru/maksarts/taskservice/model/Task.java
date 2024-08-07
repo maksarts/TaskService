@@ -3,6 +3,7 @@ package ru.maksarts.taskservice.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -66,6 +67,7 @@ public class Task {
     }
 
     @PrePersist
+    @PreUpdate
     void fillPersistent() {
         if (taskStatus != null) {
             this.taskStatusValue = taskStatus.getStatus();
