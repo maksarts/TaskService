@@ -1,5 +1,6 @@
 package ru.maksarts.taskservice.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,5 +17,6 @@ public class LoginResponseError {
     private String error;
     private Instant timestamp;
     private String message;
+    @JsonIgnore
     private String path;
 }

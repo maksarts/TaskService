@@ -39,19 +39,7 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
 
-    @PostMapping("/register")
-    public ResponseEntity<LoginResponse> register(@Valid @RequestBody RegisterRequest request) {
-        LoginResponse authenticationResponse = authService.register(request);
-        log.warn("User [{}] registered successfully", authenticationResponse.getEmail());
-        ResponseCookie jwtCookie = jwtService.generateJwtCookie(authenticationResponse.getToken());
-        ResponseCookie refreshTokenCookie = refreshTokenService.generateRefreshTokenCookie(authenticationResponse.getRefreshToken());
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                .header(HttpHeaders.SET_COOKIE,refreshTokenCookie.toString())
-                .body(authenticationResponse);
-    }
 
-    @PostMapping("/authenticate")
     @Operation(
             responses = {
                     @ApiResponse(
@@ -65,6 +53,33 @@ public class AuthController {
                     )
             }
     )
+    @PostMapping("/register")
+    public ResponseEntity<LoginResponse> register(@Valid @RequestBody RegisterRequest request) {
+        LoginResponse authenticationResponse = authService.register(request);
+        log.warn("User [{}] registered successfully", authenticationResponse.getEmail());
+        ResponseCookie jwtCookie = jwtService.generateJwtCookie(authenticationResponse.getToken());
+        ResponseCookie refreshTokenCookie = refreshTokenService.generateRefreshTokenCookie(authenticationResponse.getRefreshToken());
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                .header(HttpHeaders.SET_COOKIE,refreshTokenCookie.toString())
+                .body(authenticationResponse);
+    }
+
+
+    @Operation(
+            responses = {
+                    @ApiResponse(
+                            description = "Success",
+                            responseCode = "200"
+                    ),
+                    @ApiResponse(
+                            description = "Unauthorized",
+                            responseCode = "401",
+                            content = {@Content(schema = @Schema(implementation = ErrorResponse.class), mediaType = "application/json")}
+                    )
+            }
+    )
+    @PostMapping("/authenticate")
     public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginRequest request) {
         LoginResponse authenticationResponse = authService.authenticate(request);
         log.warn("User [{}] authorised successfully", authenticationResponse.getEmail());
@@ -89,11 +104,6 @@ public class AuthController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, NewJwtCookie.toString())
                 .build();
-    }
-    @GetMapping("/info")
-    public Authentication getAuthentication(@RequestBody LoginRequest request){
-        return authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
     }
 
     @PostMapping("/logout")
