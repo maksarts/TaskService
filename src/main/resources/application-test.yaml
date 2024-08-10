@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: TaskService
+  datasource:
+    url: jdbc:postgresql://localhost:5432/taskservice_db_test
+    username: admin
+    password: admin
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        ddl-auto: update
+  security:
+    user:
+      name: admin
+      password: admin
+
+server:
+  port: 8080
+
+taskservice:
+  security:
+    jwt:
+      expiration: 3600000 #  1 h in ms
+      cookie-name: jwt-cookie
+      refresh-token:
+        expiration: 1296000000 # 15 days in ms
+        cookie-name: refresh-jwt-cookie

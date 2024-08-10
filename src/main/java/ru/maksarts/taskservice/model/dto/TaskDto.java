@@ -4,10 +4,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @Schema(description = "Request of create task")
+@AllArgsConstructor
 public class TaskDto {
     @Schema(description = "Task title")
     @NotBlank(message = "Title is mandatory")
