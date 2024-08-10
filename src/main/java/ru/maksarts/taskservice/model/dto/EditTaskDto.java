@@ -13,29 +13,29 @@ import lombok.NoArgsConstructor;
 import ru.maksarts.taskservice.model.TaskStatus;
 
 @Data
-@Schema(description = "Структура запроса на изменение задачи в TaskService")
+@Schema(description = "Request of edit task")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class EditTaskDto {
-    @Schema(description = "ID задачи")
+    @Schema(description = "ID of the task")
     @NotNull(message = "ID is mandatory")
     private Long id;
 
-    @Schema(description = "Заголовок задачи")
+    @Schema(description = "Task title")
     private String title;
 
-    @Schema(description = "Описание задачи")
+    @Schema(description = "Task description")
     private String description;
 
-    @Schema(description = "Приоритет задачи (0 - по умолчанию, чем выше значение, тем выше приоритет)")
+    @Schema(description = "Priority of task (0 - by default, higher priority -> higher value)")
     @Min(0)
     private Integer priority;
 
-    @Schema(description = "Исполнитель задачи")
+    @Schema(description = "Executor of the task")
     @Email
     private String executorEmail;
 
-    @Schema(description = "Статус задачи")
+    @Schema(description = "Status of the task")
     private String taskStatus;
 }

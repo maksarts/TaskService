@@ -7,13 +7,13 @@ import lombok.Data;
 @Data
 @Builder
 public class LoginResponse {
-    @Schema(description = "email авторизованного пользователя")
+    @Schema(description = "email of authorised user")
     private String email;
 
-    @Schema(description = "JWT token, необходимый для доступа к API")
+    @Schema(description = "JWT token, needed for the API access")
     private String token;
 
-    @Schema(description = "Описание ошибки в случае неудачной авторизации")
+    @Schema(description = "Error description in case of fail")
     private String errMsg;
 
     private String refreshToken;

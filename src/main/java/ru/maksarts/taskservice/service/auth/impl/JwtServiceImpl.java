@@ -1,6 +1,8 @@
 package ru.maksarts.taskservice.service.auth.impl;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
@@ -12,10 +14,6 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
-import ru.maksarts.taskservice.model.Employee;
-import ru.maksarts.taskservice.model.Token;
-import ru.maksarts.taskservice.repository.TokenRepository;
-import ru.maksarts.taskservice.service.EmployeeService;
 import ru.maksarts.taskservice.service.auth.JwtService;
 
 import java.security.Key;

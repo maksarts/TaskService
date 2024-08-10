@@ -7,7 +7,6 @@ import ru.maksarts.taskservice.model.Employee;
 import ru.maksarts.taskservice.model.Task;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {

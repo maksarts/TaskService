@@ -1,11 +1,9 @@
 package ru.maksarts.taskservice.model;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-
-import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -34,7 +32,6 @@ public class Comment {
     @Column(name = "content", nullable = false)
     private String content;
 
-    @Schema(description = "Дата создания")
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_ts", nullable = false, updatable = false)
     @CreationTimestamp

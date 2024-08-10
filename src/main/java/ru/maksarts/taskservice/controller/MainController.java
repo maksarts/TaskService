@@ -1,35 +1,28 @@
 package ru.maksarts.taskservice.controller;
 
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.postgresql.util.PSQLException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.validation.BindException;
-import org.springframework.web.bind.ServletRequestBindingException;
-import org.webjars.NotFoundException;
-import ru.maksarts.taskservice.exception.ClientSideErrorException;
-import ru.maksarts.taskservice.model.Comment;
-import ru.maksarts.taskservice.model.Employee;
-import ru.maksarts.taskservice.model.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.maksarts.taskservice.model.Comment;
+import ru.maksarts.taskservice.model.Employee;
 import ru.maksarts.taskservice.model.Task;
-import ru.maksarts.taskservice.service.TokenService;
-import ru.maksarts.taskservice.service.auth.AuthService;
+import ru.maksarts.taskservice.model.dto.BasicResponse;
+import ru.maksarts.taskservice.model.dto.CommentDto;
+import ru.maksarts.taskservice.model.dto.EditTaskDto;
+import ru.maksarts.taskservice.model.dto.TaskDto;
 import ru.maksarts.taskservice.service.CommentService;
 import ru.maksarts.taskservice.service.TaskService;
+import ru.maksarts.taskservice.service.TokenService;
 
 import java.util.List;
 
