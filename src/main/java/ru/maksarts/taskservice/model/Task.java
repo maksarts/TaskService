@@ -48,7 +48,7 @@ public class Task {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_ts", nullable = false, updatable = false)
     @CreationTimestamp
-    private Date created_ts;
+    private Date createdTs;
 
     @JsonIgnore
     @Basic(optional = false)

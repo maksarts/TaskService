@@ -1,4 +1,4 @@
-FROM openjdk:11-slim
+FROM openjdk:17-slim
 
 ARG JAR_FILE
 COPY ${JAR_FILE} app.jar

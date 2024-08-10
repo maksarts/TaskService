@@ -9,6 +9,8 @@ import jakarta.persistence.criteria.ParameterExpression;
 import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
@@ -35,14 +37,18 @@ public class CommentService {
         return commentRepository.findById(id).orElseThrow(() -> new NotFoundException("Comment not found"));
     }
 
-    public List<Comment> getCommentByAuthor(@NonNull String authorEmail) {
+    public List<Comment> getCommentByAuthor(@NonNull String authorEmail, Integer page, Integer pageSize) {
         Employee employee = employeeService.getEmployeeByEmail(authorEmail);
-        return commentRepository.getCommentByAuthorEmail(employee);
+        return commentRepository.getCommentByAuthorEmail(
+                employee,
+                PageRequest.of(page, pageSize, Sort.by("createdTs").descending()));
     }
 
-    public List<Comment> getCommentByTaskId(@NonNull Long taskId) {
+    public List<Comment> getCommentByTaskId(@NonNull Long taskId, Integer page, Integer pageSize) {
        Task task = taskService.getTaskById(taskId);
-       return commentRepository.getCommentByTaskId(task);
+       return commentRepository.getCommentByTaskId(
+               task,
+               PageRequest.of(page, pageSize, Sort.by("createdTs").descending()));
     }
 
 

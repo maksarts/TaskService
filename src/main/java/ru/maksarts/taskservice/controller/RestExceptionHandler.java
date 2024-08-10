@@ -80,7 +80,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler({AuthenticationException.class, SignatureException.class})
     @ResponseBody
     public ResponseEntity<LoginResponseError> handleAuthenticationException(Exception authException, WebRequest request) {
-        log.error("Unauthorized error: {}", authException.getMessage(), authException);
+        log.error("Unauthorized error: {}", authException.getMessage());
         LoginResponseError body = LoginResponseError.builder()
                 .status(HttpServletResponse.SC_UNAUTHORIZED)
                 .error("Unauthorized")

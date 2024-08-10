@@ -67,7 +67,7 @@ public class MainController {
 
     @Operation(
             summary = "Get tasks of author",
-            description = "Returns all tasks by specified author"
+            description = "Returns all tasks by specified author, paginated, sorted by created timestamp desc"
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = List.class), mediaType = "application/json") }),
@@ -75,9 +75,11 @@ public class MainController {
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }),
             @ApiResponse(responseCode = "401", content = { @Content(schema = @Schema()) })
     })
-    @GetMapping(value = "/getTaskByAuthor")
-    public ResponseEntity<List<Task>> getTaskByAuthor(@RequestParam(name = "email") String email){
-        List<Task> task = taskService.getTaskByAuthor(email);
+    @GetMapping(value = "/getTaskByAuthor/{email}/{page}")
+    public ResponseEntity<List<Task>> getTaskByAuthor(@PathVariable(name = "email") String email,
+                                                      @PathVariable(name = "page") Integer page,
+                                                      @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize){
+        List<Task> task = taskService.getTaskByAuthor(email, page, pageSize);
         if (task != null && !task.isEmpty()) {
             return ResponseEntity.ok(task);
         } else {
@@ -92,7 +94,7 @@ public class MainController {
 
     @Operation(
             summary = "Get tasks of executor",
-            description = "Returns all tasks by specified executor"
+            description = "Returns all tasks by specified executor, paginated, sorted by created timestamp desc"
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = List.class), mediaType = "application/json") }),
@@ -100,9 +102,11 @@ public class MainController {
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }),
             @ApiResponse(responseCode = "401", content = { @Content(schema = @Schema()) })
     })
-    @GetMapping(value = "/getTaskByExecutor")
-    public ResponseEntity<List<Task>> getTaskByExecutor(@RequestParam(name = "email") String email){
-        List<Task> task = taskService.getTaskByExecutor(email);
+    @GetMapping(value = "/getTaskByExecutor/{email}/{page}")
+    public ResponseEntity<List<Task>> getTaskByExecutor(@PathVariable(name = "email") String email,
+                                                        @PathVariable(name = "page") Integer page,
+                                                        @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize){
+        List<Task> task = taskService.getTaskByExecutor(email, page, pageSize);
         if (task != null && !task.isEmpty()) {
             return ResponseEntity.ok(task);
         } else {
@@ -128,7 +132,7 @@ public class MainController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createTask(@Valid @RequestBody TaskDto taskDto,
-                                                    @RequestHeader("Authorization") String authHeader) {
+                                        @RequestHeader("Authorization") String authHeader) {
 
         Employee author = tokenService.getEmployeeByAuthHeader(authHeader); // get author of task by his JWT token
         Task task = taskService.createTask(taskDto, author);
@@ -158,7 +162,7 @@ public class MainController {
     })
     @PutMapping(value = "/updateTask")
     public ResponseEntity<?> updateTask(@Valid @RequestBody EditTaskDto editTaskDto,
-                                                    @RequestHeader("Authorization") String authHeader){
+                                        @RequestHeader("Authorization") String authHeader){
         Employee author = tokenService.getEmployeeByAuthHeader(authHeader); // get author of request by his JWT token
         Task taskToEdit = taskService.getTaskById(editTaskDto.getId());
         if(taskToEdit.getAuthorEmail().getEmail().equals(author.getEmail())){
@@ -230,7 +234,7 @@ public class MainController {
     })
     @DeleteMapping(value = "/deleteTask")
     public ResponseEntity<BasicResponse> deleteTask(@RequestParam(name = "id") Long id,
-                           @RequestHeader("Authorization") String authHeader){
+                                                    @RequestHeader("Authorization") String authHeader){
         Employee author = tokenService.getEmployeeByAuthHeader(authHeader); // get author of request by his JWT token
         Task taskToDelete = taskService.getTaskById(id);
         if(taskToDelete.getAuthorEmail().getEmail().equals(author.getEmail())){
@@ -287,7 +291,7 @@ public class MainController {
 
     @Operation(
             summary = "Get comments of author",
-            description = "Returns all comments by specified author"
+            description = "Returns all comments by specified author, paginated, sorted by created timestamp desc"
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = List.class), mediaType = "application/json") }),
@@ -295,9 +299,11 @@ public class MainController {
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }),
             @ApiResponse(responseCode = "401", content = { @Content(schema = @Schema()) })
     })
-    @GetMapping(value = "/getCommentsByAuthor")
-    public ResponseEntity<List<Comment>> getCommentsByAuthor(@RequestParam(name = "email") String email){
-        List<Comment> comments = commentService.getCommentByAuthor(email);
+    @GetMapping(value = "/getCommentsByAuthor/{email}/{page}")
+    public ResponseEntity<List<Comment>> getCommentsByAuthor(@PathVariable(name = "email") String email,
+                                                             @PathVariable(name = "page") Integer page,
+                                                             @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize){
+        List<Comment> comments = commentService.getCommentByAuthor(email, page, pageSize);
         if (comments != null && !comments.isEmpty()) {
             return ResponseEntity.ok(comments);
         } else {
@@ -311,7 +317,7 @@ public class MainController {
 
     @Operation(
             summary = "Get comments by task ID",
-            description = "Returns all comments under specified taskId"
+            description = "Returns all comments under specified taskId, paginated, sorted by created timestamp desc"
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = List.class), mediaType = "application/json") }),
@@ -319,9 +325,11 @@ public class MainController {
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }),
             @ApiResponse(responseCode = "401", content = { @Content(schema = @Schema()) })
     })
-    @GetMapping(value = "/getCommentsByTask")
-    public ResponseEntity<List<Comment>> getCommentsByTask(@RequestParam(name = "taskId") Long taskId){
-        List<Comment> comments = commentService.getCommentByTaskId(taskId);
+    @GetMapping(value = "/getCommentsByTask/{taskId}/{page}")
+    public ResponseEntity<List<Comment>> getCommentsByTask(@PathVariable(name = "taskId") Long taskId,
+                                                           @PathVariable(name = "page") Integer page,
+                                                           @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize){
+        List<Comment> comments = commentService.getCommentByTaskId(taskId, page, pageSize);
         if (comments != null && !comments.isEmpty()) {
             return ResponseEntity.ok(comments);
         } else {
@@ -345,7 +353,7 @@ public class MainController {
     })
     @DeleteMapping(value = "/deleteComment")
     public ResponseEntity<BasicResponse> deleteComment(@RequestParam(name = "id") Long id,
-                                                    @RequestHeader("Authorization") String authHeader){
+                                                       @RequestHeader("Authorization") String authHeader){
         Employee author = tokenService.getEmployeeByAuthHeader(authHeader); // get author of request by his JWT token
         Comment commentToDelete = commentService.getCommentById(id);
         if(commentToDelete.getAuthorEmail().getEmail().equals(author.getEmail())){

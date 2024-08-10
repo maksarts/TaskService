@@ -7,6 +7,8 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.ParameterExpression;
 import jakarta.persistence.criteria.Root;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.transaction.annotation.Transactional;
 import org.webjars.NotFoundException;
@@ -43,14 +45,18 @@ public class TaskService {
         return taskRepository.findById(id).orElseThrow(() -> new NotFoundException("Task not found"));
     }
 
-    public List<Task> getTaskByAuthor(@NonNull String authorEmail){
+    public List<Task> getTaskByAuthor(@NonNull String authorEmail, Integer page, Integer pageSize){
         Employee employee = employeeService.getEmployeeByEmail(authorEmail);
-        return taskRepository.getTaskByAuthorEmail(employee).stream().toList();
+        return taskRepository.getTaskByAuthorEmail(
+                employee,
+                PageRequest.of(page, pageSize, Sort.by("createdTs").descending()));
     }
 
-    public List<Task> getTaskByExecutor(@NonNull String executorEmail){
+    public List<Task> getTaskByExecutor(@NonNull String executorEmail, Integer page, Integer pageSize){
         Employee employee = employeeService.getEmployeeByEmail(executorEmail);
-        return taskRepository.getTaskByExecutorEmail(employee).stream().toList();
+        return taskRepository.getTaskByExecutorEmail(
+                employee,
+                PageRequest.of(page, pageSize, Sort.by("createdTs").descending()));
     }
 
 
