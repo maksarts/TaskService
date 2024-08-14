@@ -4,6 +4,7 @@ import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.PropertyValueException;
+import org.postgresql.util.PSQLException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -43,6 +44,14 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(
                 BasicResponse.builder().errMsg(ex.getLocalizedMessage()).build(),
                 HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler({PSQLException.class})
+    @ResponseBody
+    protected ResponseEntity<Object> handlePSQLException(PSQLException ex) {
+        return new ResponseEntity<>(
+                BasicResponse.builder().errMsg(ex.getLocalizedMessage()).build(),
+                HttpStatus.BAD_REQUEST);
     }
 
     @Override

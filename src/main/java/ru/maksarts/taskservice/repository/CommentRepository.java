@@ -13,4 +13,5 @@ import java.util.List;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> getCommentByAuthorEmail(Employee author, Pageable pageable);
     List<Comment> getCommentByTaskId(Task task, Pageable pageable);
+    void deleteAllByTaskId(Task task);
 }

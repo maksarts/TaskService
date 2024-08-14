@@ -15,6 +15,7 @@ import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.MultiValueMap;
+import ru.maksarts.taskservice.model.Comment;
 import ru.maksarts.taskservice.model.Task;
 import ru.maksarts.taskservice.model.dto.*;
 
@@ -153,7 +154,7 @@ public class TaskServiceIntegrationTests {
 
 
     @Test
-    @Order(6)
+    @Order(8)
     public void testCreateTaskWithSameTitle() {
         String token = auth();
 
@@ -171,6 +172,55 @@ public class TaskServiceIntegrationTests {
 
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
     }
+
+
+
+    @Test
+    @Order(9)
+    public void testCreateComment() throws JsonProcessingException {
+        // auth
+        String token = auth();
+
+        HttpHeaders headersWithToken = new HttpHeaders();
+        headersWithToken.setBearerAuth(token);
+        headersWithToken.set("Accept-Encoding", "gzip, deflate, br");
+
+
+        // get task id
+        HttpEntity<?> request = new HttpEntity<>(null, headersWithToken);
+        ResponseEntity<String> response = restTemplate
+                .exchange("/taskservice/api/v1/getTaskByAuthor/test@gmail.com/0",
+                        HttpMethod.GET,
+                        request,
+                        String.class);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+
+        ObjectMapper mapper = new ObjectMapper();
+        List<Task> body = mapper.readValue(response.getBody(), new TypeReference<List<Task>>(){});
+        Task task = body.get(0);
+
+        assertNotNull(task);
+
+        // create comment
+        CommentDto commentDto = CommentDto.builder()
+                .taskId(task.getId())
+                .content("Some comment")
+                .build();
+
+        HttpEntity<CommentDto> requestComment = new HttpEntity<>(commentDto, headersWithToken);
+        ResponseEntity<Comment> responseComment = restTemplate.postForEntity(
+                "/taskservice/api/v1/createComment",
+                requestComment,
+                Comment.class);
+
+        assertEquals(HttpStatus.OK, responseComment.getStatusCode());
+        assertNotNull(responseComment.getBody());
+        assertEquals("test@gmail.com", responseComment.getBody().getAuthorEmail().getEmail());
+        assertEquals("Some comment", responseComment.getBody().getContent());
+    }
+
 
 
     @Test
@@ -218,6 +268,15 @@ public class TaskServiceIntegrationTests {
                         Object.class);
 
         assertEquals(HttpStatus.NOT_FOUND, responseAfterDelete.getStatusCode());
+
+        // check if all comments under that task successfully deleted
+        ResponseEntity<Object> responseCommentsAfterDelete = restTemplate
+                .exchange("/taskservice/api/v1/getCommentsByTask/" + task.getId() + "/0",
+                        HttpMethod.GET,
+                        getRequestWithBearerAuth,
+                        Object.class);
+
+        assertEquals(HttpStatus.NOT_FOUND, responseCommentsAfterDelete.getStatusCode());
     }
 
 

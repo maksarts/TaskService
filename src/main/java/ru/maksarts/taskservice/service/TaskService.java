@@ -1,5 +1,6 @@
 package ru.maksarts.taskservice.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -14,21 +15,18 @@ import ru.maksarts.taskservice.model.Task;
 import ru.maksarts.taskservice.model.TaskStatus;
 import ru.maksarts.taskservice.model.dto.EditTaskDto;
 import ru.maksarts.taskservice.model.dto.TaskDto;
+import ru.maksarts.taskservice.repository.CommentRepository;
 import ru.maksarts.taskservice.repository.TaskRepository;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class TaskService {
     private final TaskRepository taskRepository;
 
     private final EmployeeService employeeService;
-
-    @Autowired
-    public TaskService(TaskRepository repository, EmployeeService employeeService){
-        this.taskRepository = repository;
-        this.employeeService = employeeService;
-    }
+    private final CommentRepository commentRepository;
 
     public List<Task> getAllTasks() {
         return taskRepository.findAll();
@@ -123,6 +121,8 @@ public class TaskService {
     @Transactional
     @Modifying
     public void deleteTask(@NonNull Long id) {
+        Task taskToDelete = this.getTaskById(id);
+        commentRepository.deleteAllByTaskId(taskToDelete); // delete all child comments
         taskRepository.deleteById(id);
     }
 }
