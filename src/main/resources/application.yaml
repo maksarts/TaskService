@@ -4,9 +4,9 @@ spring:
   application:
     name: TaskService
   datasource:
-    url: jdbc:postgresql://localhost:5432/taskservice_db
-    username: admin
-    password: admin
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
   jpa:
     properties:
       hibernate:
@@ -14,8 +14,8 @@ spring:
         ddl-auto: update
   security:
     user:
-      name: admin
-      password: admin
+      name: ${SECURITY_USER}
+      password: ${SECURITY_PASSWORD}
 
 server:
   port: 8080
