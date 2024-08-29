@@ -14,7 +14,7 @@ import ru.maksarts.taskservice.model.RefreshToken;
 import ru.maksarts.taskservice.model.dto.RefreshTokenRequest;
 import ru.maksarts.taskservice.model.dto.RefreshTokenResponse;
 import ru.maksarts.taskservice.repository.RefreshTokenRepository;
-import ru.maksarts.taskservice.service.EmployeeService;
+import ru.maksarts.taskservice.service.impl.EmployeeServiceImpl;
 import ru.maksarts.taskservice.service.auth.JwtService;
 import ru.maksarts.taskservice.service.auth.RefreshTokenService;
 
@@ -27,7 +27,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class RefreshTokenServiceImpl implements RefreshTokenService {
-    private final EmployeeService employeeService;
+    private final EmployeeServiceImpl employeeService;
     private final EmployeeUserDetailsService employeeUserDetailsService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtService jwtService;
@@ -45,6 +45,10 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
                 .token(Base64.getEncoder().encodeToString(UUID.randomUUID().toString().getBytes()))
                 .expiryDate(Instant.now().plusMillis(refreshExpiration))
                 .build();
+
+        Optional<RefreshToken> refreshTokenOpt = refreshTokenRepository.findByEmployee(emp);
+        refreshTokenOpt.ifPresent(token -> refreshToken.setId(token.getId()));
+
         return refreshTokenRepository.save(refreshToken);
     }
 

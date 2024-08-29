@@ -94,6 +94,7 @@ If evererything is fine you will see
 [INFO] ----------------
 ```
 3. Run whole application (Spring Boot service + PostgreSQL DB) using command
+###### *Note: you may need to delete container with database used for tests because it uses same 5432 port with dev database*
 ```bash
 docker-compose up -d
 ```
