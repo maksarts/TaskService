@@ -59,8 +59,7 @@ public class TaskServiceImpl implements TaskService {
         return taskRepository.save(task);
     }
 
-    @Transactional
-    @Modifying
+
     public Task createTask(@NonNull TaskDto taskDto, @NonNull Employee emp) {
         Task newTask = new Task();
 
@@ -94,8 +93,6 @@ public class TaskServiceImpl implements TaskService {
     }
 
 
-    @Transactional
-    @Modifying
     public Task updateTask(@NonNull Task taskToEdit, @NonNull EditTaskDto editTaskDto) {
         if(editTaskDto.getDescription() != null) taskToEdit.setDescription(editTaskDto.getDescription());
         if(editTaskDto.getPriority() != null) taskToEdit.setPriority(editTaskDto.getPriority());
