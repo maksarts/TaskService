@@ -16,6 +16,7 @@ import ru.maksarts.taskservice.model.dto.RegisterRequest;
 import ru.maksarts.taskservice.repository.TokenRepository;
 import ru.maksarts.taskservice.service.EmployeeService;
 import ru.maksarts.taskservice.service.auth.AuthService;
+import ru.maksarts.taskservice.service.auth.JwtService;
 import ru.maksarts.taskservice.service.auth.RefreshTokenService;
 
 @Service
@@ -24,7 +25,7 @@ import ru.maksarts.taskservice.service.auth.RefreshTokenService;
 public class AuthServiceImpl implements AuthService {
 
     private final AuthenticationManager authenticationManager;
-    private final JwtServiceImpl jwtService;
+    private final JwtService jwtService;
     private final EmployeeUserDetailsService employeeUserDetailsService;
     private final RefreshTokenService refreshTokenService;
     private final EmployeeService employeeService;
